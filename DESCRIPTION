@@ -1,0 +1,21 @@
+Package: enrichr.db
+Title: Enrichr database of gene lists
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Clemens",
+           family = "Hug",
+           role = c("aut", "cre"),
+           email = "clemens.hug@gmail.com",
+           comment = c(ORCID = "0000-0002-8299-3274"))
+Description: enrichr.db is a data package providing all gene sets from the
+    Enrichr database in a conventient format for programmatic use. Based on the
+    2019-01-23 release of Enrichr.
+License: CC0
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    rvest,
+    xml2,
+    dplyr,
+    tidyr
+RoxygenNote: 6.1.1

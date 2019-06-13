@@ -8,6 +8,8 @@ a format that makes it easy to access the gene sets programmatically from R.
 You can install the released version of enrichr.db from [Github](https://github.com/clemenshug/enrichr.db) with:
 
 ``` r
+if (!requireNamespace("remotes", quietly = TRUE))
+  install.packages("remotes")
 remotes::install_github("clemenshug/enrichr.db")
 ```
 

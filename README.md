@@ -3,6 +3,8 @@
 The goal of enrichr.db is to provide the data from [Enrichr](http://amp.pharm.mssm.edu/Enrichr/) in
 a format that makes it easy to access the gene sets programmatically from R.
 
+The current Enrichr release included is from 2019-01-23.
+
 ## Installation
 
 You can install the released version of enrichr.db from [Github](https://github.com/clemenshug/enrichr.db) with:
@@ -10,7 +12,7 @@ You can install the released version of enrichr.db from [Github](https://github.
 ``` r
 if (!requireNamespace("remotes", quietly = TRUE))
   install.packages("remotes")
-remotes::install_github("clemenshug/enrichr.db")
+remotes::install_url("https://github.com/clemenshug/enrichr.db/releases/download/v0.1/enrichr.db_0.1.tar.gz")
 ```
 
 ## Example

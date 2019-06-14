@@ -1,6 +1,6 @@
 Package: enrichr.db
 Title: Enrichr database of gene lists
-Version: 0.0.0.9000
+Version: 0.1
 Authors@R: 
     person(given = "Clemens",
            family = "Hug",
@@ -19,3 +19,5 @@ Suggests:
     dplyr,
     tidyr
 RoxygenNote: 6.1.1
+Depends: 
+    tibble

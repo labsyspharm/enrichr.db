@@ -58,12 +58,13 @@ enrichr_terms <- files %>%
       #   mutate(targets = map(value, ~enframe(.x, "target", "inclusion")))
       function(l) {
         l[[1]][["terms"]] %>%
-          map(
-            ~names(.x) %>%
-              genebabel::query_hgnc(match_cols = c("symbol", "prev_symbol", "alias_symbol")) %>%
-              drop_na(symbol) %>%
-              pull(symbol)
-          )
+          map(~names(.x))
+          # map(
+          #   ~names(.x) %>%
+          #     genebabel::query_hgnc(match_cols = c("symbol", "prev_symbol", "alias_symbol")) %>%
+          #     drop_na(symbol) %>%
+          #     pull(symbol)
+          # )
       }
     ),
     meta = map(
@@ -80,4 +81,4 @@ enrichr_terms <- files %>%
   unnest(meta) %>%
   select(1:5, category, description = format, data)
 
-usethis::use_data(enrichr_terms, compress = "gzip", overwrite = TRUE)
+usethis::use_data(enrichr_terms, compress = "xz", overwrite = TRUE)

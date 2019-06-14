@@ -23,14 +23,11 @@ enrichr_terms
 }
 \description{
 A dataset containing all gene sets from the Enrichr database including
-metadata.
+metadata. Release 2019-01-23.
 }
 \details{
 Where multiple versions are available, only the most recent release
 is included.
-
-All gene symbols in the gene lists where updated to the HGNC canocial symbols
-as of 2019-06-01.
 
 Please acknowledge Enrichr in your publications by citing the following references:
 

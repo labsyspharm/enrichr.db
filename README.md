@@ -12,18 +12,21 @@ The current Enrichr release included is from 2019-01-23.
 ## Installation
 
 You can install the released version of enrichr.db from
-[Github](https://github.com/clemenshug/enrichr.db) with:
+[Github](https://github.com/labsyspharm/enrichr.db) with:
 
 ``` r
 if (!requireNamespace("remotes", quietly = TRUE))
   install.packages("remotes")
-remotes::install_url("https://github.com/clemenshug/enrichr.db/releases/download/v0.1/enrichr.db_0.1.tar.gz")
+remotes::install_url("https://github.com/labsyspharm/enrichr.db/releases/download/v0.1/enrichr.db_0.1.tar.gz")
 ```
 
 ## Example
 
-This is a basic example which shows you how to query the gene set
-database:
+This is a basic example which shows how to query the gene set database
+and use the gene sets for enrichment analysis using
+[fgsea](http://bioconductor.org/packages/fgsea/).
+
+### Querying the database
 
 ``` r
 library(tidyverse)
@@ -55,10 +58,15 @@ symbols.
 | DrugMatrix                                               | NA   |     7876 |           5209 |                 300 | Diseases/Drugs | {0} is differentially expressed in sample {1}                        | \<7876 gene sets\> |
 | RNA-Seq\_Disease\_Gene\_and\_Drug\_Signatures\_from\_GEO | NA   |     1302 |          22440 |                 505 | Crowd          | {0} is differentially expressed in {1}.                              | \<1302 gene sets\> |
 
+We can have a look a the first five gene sets in the
+`Drug_Perturbations_from_GEO_2014` library. We can print the first 10
+genes of each gene set.
+
 ``` r
-# Printing 10 genes of the first 5 gene sets in the first library we found (Drug_Perturbations_from_GEO_2014)
 print(
-  head(drug_gene_sets$data[[1]], n = 5) %>%
+  # Drug_Perturbations_from_GEO_2014 is the first library
+  drug_gene_sets$data[[1]] %>%
+    head(n = 5) %>%
     map(head, n = 10)
 )
 #> $`estradiol_mus musculus_gpl339_gse16854_chdir_down`
@@ -81,6 +89,40 @@ print(
 #>  [1] "DUSP4"   "NME3"    "AKR1A1"  "TUBB2A"  "AKR7A2"  "PPP1CB"  "MRPL23" 
 #>  [8] "TMEM258" "TMCO6"   "KRT19"
 ```
+
+### Enrichment analysis
+
+We can use the gene sets in the `data` column directly for gene set
+enrichment analysis using `fgsea`. Again, we’re using the first library
+that we found (`Drug_Perturbations_from_GEO_2014`).
+
+``` r
+library(fgsea)
+#> Loading required package: Rcpp
+
+# Making random fake expression results
+genes <- Reduce(union, drug_gene_sets$data[[1]])
+expression_res <- setNames(
+  rnorm(length(genes), 0, 0.5),
+  genes
+)
+
+enrichment_res <- fgseaMultilevel(
+  pathways = drug_gene_sets$data[[1]],
+  stats = expression_res,
+  sampleSize = 101,
+  minSize = 15
+)
+```
+
+| pathway                                                                                |      pval |      padj |   log2err |          ES |        NES | size |
+| :------------------------------------------------------------------------------------- | --------: | --------: | --------: | ----------: | ---------: | ---: |
+| temozolomide\_homo sapiens\_gpl10558\_gse43452\_chdir\_down                            | 0.0001062 | 0.0721128 | 0.5384341 | \-0.3282901 | \-1.641434 |  203 |
+| probucol\_mus musculus\_gpl9525\_gds3618\_chdir\_down                                  | 0.0003863 | 0.1311507 | 0.4984931 |   0.3805265 |   1.790300 |  111 |
+| calcitriol\_homo sapiens\_gpl570\_gse35925\_chdir\_down                                | 0.0011894 | 0.2098985 | 0.4550599 | \-0.3263342 | \-1.562751 |  144 |
+| troglitazone\_rattus norvegicus\_gpl341\_skeletal muscle\_gds3850\_chdir\_up           | 0.0012365 | 0.2098985 | 0.4550599 | \-0.3995772 | \-1.738634 |   79 |
+| alitretinoin\_rattus norvegicus\_gpl85\_mammary gland\_gds2385\_chdir\_down            | 0.0257551 | 0.5797157 | 0.3524879 | \-0.3982703 | \-1.524028 |   42 |
+| amoxicillin\_rattus norvegicus\_gpl341\_proximal small intestine\_gds1273\_chdir\_down | 0.0149071 | 0.5797157 | 0.3807304 |   0.3562649 |   1.534098 |   69 |
 
 ## Funding
 

@@ -23,17 +23,21 @@ The current Enrichr release included is from 2019-01-23.
 ## Installation
 
 You can install the released version of enrichr.db from
-[Github](https://github.com/clemenshug/enrichr.db) with:
+[Github](https://github.com/labsyspharm/enrichr.db) with:
 
 ```{r installation, eval = FALSE}
 if (!requireNamespace("remotes", quietly = TRUE))
   install.packages("remotes")
-remotes::install_url("https://github.com/clemenshug/enrichr.db/releases/download/v0.1/enrichr.db_0.1.tar.gz")
+remotes::install_url("https://github.com/labsyspharm/enrichr.db/releases/download/v0.1/enrichr.db_0.1.tar.gz")
 ```
 
 ## Example
 
-This is a basic example which shows you how to query the gene set database:
+This is a basic example which shows how to query the gene set database and
+use the gene sets for enrichment analysis using
+[fgsea](http://bioconductor.org/packages/fgsea/).
+
+### Querying the database
 
 ```{r query_drug_sets}
 library(tidyverse)
@@ -52,11 +56,49 @@ a gene set and contains a vector of HGCN gene symbols.
 knitr::kable(drug_gene_sets %>% mutate(data = paste0("<", map_int(data, length), " gene sets>")))
 ```
 
+We can have a look a the first five gene sets in the
+`Drug_Perturbations_from_GEO_2014` library. We can print the first 10 genes of
+each gene set.
+
 ```{r print_drug_sets}
-# Printing 10 genes of the first 5 gene sets in the first library we found (Drug_Perturbations_from_GEO_2014)
 print(
-  head(drug_gene_sets$data[[1]], n = 5) %>%
+  # Drug_Perturbations_from_GEO_2014 is the first library
+  drug_gene_sets$data[[1]] %>%
+    head(n = 5) %>%
     map(head, n = 10)
+)
+```
+
+### Enrichment analysis
+
+We can use the gene sets in the `data` column directly for gene set enrichment
+analysis using `fgsea`. Again, we're using the first library that we found
+(`Drug_Perturbations_from_GEO_2014`).
+
+```{r enrichment_analysis}
+library(fgsea)
+
+# Making random fake expression results
+genes <- Reduce(union, drug_gene_sets$data[[1]])
+expression_res <- setNames(
+  rnorm(length(genes), 0, 0.5),
+  genes
+)
+
+enrichment_res <- fgseaMultilevel(
+  pathways = drug_gene_sets$data[[1]],
+  stats = expression_res,
+  sampleSize = 101,
+  minSize = 15
+)
+```
+
+```{r echo = FALSE}
+knitr::kable(
+  enrichment_res %>%
+    arrange(padj) %>%
+    select(-leadingEdge) %>%
+    head()
 )
 ```
 

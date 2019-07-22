@@ -1,0 +1,67 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# enrichr.db
+
+The goal of enrichr.db is to provide the data from [Enrichr](http://amp.pharm.mssm.edu/Enrichr/) in
+a format that makes it easy to access the gene sets programmatically from R.
+
+The current Enrichr release included is from 2019-01-23.
+
+## Installation
+
+You can install the released version of enrichr.db from
+[Github](https://github.com/clemenshug/enrichr.db) with:
+
+```{r installation, eval = FALSE}
+if (!requireNamespace("remotes", quietly = TRUE))
+  install.packages("remotes")
+remotes::install_url("https://github.com/clemenshug/enrichr.db/releases/download/v0.1/enrichr.db_0.1.tar.gz")
+```
+
+## Example
+
+This is a basic example which shows you how to query the gene set database:
+
+```{r query_drug_sets}
+library(tidyverse)
+library(enrichr.db)
+
+# Finding all libraries that have something to do with drug treatments
+drug_gene_sets <- enrichr_terms %>%
+  filter(grepl("drug", library, ignore.case = TRUE))
+```
+
+This gives a data frame of gene set libraries. The gene sets are in the `data`
+column of the data frame and are implemented as lists. Each list element is
+a gene set and contains a vector of HGCN gene symbols.
+
+```{r echo = FALSE}
+knitr::kable(drug_gene_sets %>% mutate(data = paste0("<", map_int(data, length), " gene sets>")))
+```
+
+```{r print_drug_sets}
+# Printing 10 genes of the first 5 gene sets in the first library we found (Drug_Perturbations_from_GEO_2014)
+print(
+  head(drug_gene_sets$data[[1]], n = 5) %>%
+    map(head, n = 10)
+)
+```
+
+## Funding
+
+We gratefully acknowledge support by NIH Grant 1U54CA225088-01: Systems
+Pharmacology of Therapeutic and Adverse Responses to Immune Checkpoint and Small
+Molecule Drugs.
